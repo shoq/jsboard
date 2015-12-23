@@ -4,7 +4,7 @@ function Renderer(canvas, whiteSquareColor, blackSquareColor) {
 
         var context = canvas.getContext("2d");
 
-        var squareCount = chessboard.squareCount;
+        var squareCount = chessboard.getSquareCount();
         var boardSize = canvas.width;
         var squareSize = boardSize / squareCount;
 

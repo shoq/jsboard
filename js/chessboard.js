@@ -1,5 +1,9 @@
 function Chessboard(squareCount) {
 
-    this.squareCount = squareCount || 8;
+    squareCount = squareCount || 8;
+
+    this.getSquareCount = function() {
+        return squareCount;
+    }
 
 }
