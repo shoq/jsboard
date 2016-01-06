@@ -8,7 +8,8 @@ window.onload = function() {
 
     var renderer = new Renderer(canvas, "#DDDDDD", "#555555");
     chessboard = new Chessboard(8);
-
+    chessboard.resetToStandard();
+    chessboard.move(6, 4, 4, 4); // Moves white pawn from e2 to e4.
 
     var draw = function(board) {
         renderer.drawChessboard(board);
