@@ -12,9 +12,24 @@ window.onload = function() {
     chessboard.resetToStandard();
 
     setTimeout(function() {
-        chessboard.move(6, 4, 4, 4); // Moves white pawn from e2 to e4.
-
+        chessboard.move(6, 4, 4, 4);
     }, 1000);
+    
+    setTimeout(function() {
+        chessboard.move(1, 3, 3, 3);
+    }, 2000);
+    
+    setTimeout(function() {
+        chessboard.move(7, 1, 5, 2);
+    }, 3000);
+    
+    setTimeout(function() {
+        chessboard.move(3, 3, 4, 4);
+    }, 4000);
+    
+    setTimeout(function() {
+        chessboard.move(5, 2, 4, 4);
+    }, 5000);
 
     chessboard.onSizeChanged(function (board) {
         var enlargeButton = document.getElementById("enlargeButton");
