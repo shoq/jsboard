@@ -6,18 +6,17 @@ window.onload = function() {
 
     var canvas = document.getElementById("chessboardCanvas");
 
-    var renderer = new Renderer(canvas, "#DDDDDD", "#555555");
     chessboard = new Chessboard(8);
+    var renderer = new Renderer(chessboard, canvas, "#DDDDDD", "#555555");
+
     chessboard.resetToStandard();
-    chessboard.move(6, 4, 4, 4); // Moves white pawn from e2 to e4.
 
-    var draw = function(board) {
-        renderer.drawChessboard(board);
-    };
+    setTimeout(function() {
+        chessboard.move(6, 4, 4, 4); // Moves white pawn from e2 to e4.
 
-    chessboard.onSizeChanged(draw);
+    }, 1000);
 
-    chessboard.onSizeChanged(function(board) {
+    chessboard.onSizeChanged(function (board) {
         var enlargeButton = document.getElementById("enlargeButton");
         enlargeButton.disabled = !board.canEnlarge();
 
@@ -25,6 +24,5 @@ window.onload = function() {
         reduceButton.disabled = !board.canReduce();
     });
 
-    draw(chessboard);
-
+    renderer.drawChessboard();
 };
