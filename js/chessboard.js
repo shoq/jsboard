@@ -18,16 +18,14 @@ var FieldType = {
 
 function Chessboard(initialSize) {
 
-    var self = this;
-
-    minSize = 2;
-    maxSize = 16;
-    standardSize = 8;
-    size = initialSize;
-    fields = [];
+    var minSize = 2;
+    var maxSize = 16;
+    var standardSize = 8;
+    var size = initialSize;
+    var fields = [];
     
-    for (i = 0; i < size; ++i) {
-        file = [];
+    for (var i = 0; i < size; ++i) {
+        var file = [];
         for (j = 0; j < size; ++j) {
             file.push(FieldType.empty);
         }
@@ -67,50 +65,51 @@ function Chessboard(initialSize) {
         --size;
         sizeChanged.raise(null);
     };
-    
+
     this.resetToStandard = function() {
         if (size != standardSize) {
             throw new Error('Chessboard must be of the standard 8x8 size.');
-        };
+        }
         
-        for (rank = 2; rank < 6; ++rank) {
-            for (file = 0; file < 8; ++file) {
-                this.changeField(rank, file, FieldType.empty);
+        for (var rank = 2; rank < 6; ++rank) {
+            for (var file = 0; file < 8; ++file) {
+                changeField(rank, file, FieldType.empty);
             }
         }
         
-        for (file = 0; file < 8; ++file) {
-            this.changeField(1, file, FieldType.blackPawn);
-            this.changeField(6, file, FieldType.whitePawn);
+        for (var file = 0; file < 8; ++file) {
+            changeField(1, file, FieldType.blackPawn);
+            changeField(6, file, FieldType.whitePawn);
         }
         
-        this.changeField(0, 0, FieldType.blackRook);
-        this.changeField(0, 1, FieldType.blackKnight);
-        this.changeField(0, 2, FieldType.blackBishop);
-        this.changeField(0, 3, FieldType.blackQueen);
-        this.changeField(0, 4, FieldType.blackKing);
-        this.changeField(0, 5, FieldType.blackBishop);
-        this.changeField(0, 6, FieldType.blackKnight);
-        this.changeField(0, 7, FieldType.blackRook);
+        changeField(0, 0, FieldType.blackRook);
+        changeField(0, 1, FieldType.blackKnight);
+        changeField(0, 2, FieldType.blackBishop);
+        changeField(0, 3, FieldType.blackQueen);
+        changeField(0, 4, FieldType.blackKing);
+        changeField(0, 5, FieldType.blackBishop);
+        changeField(0, 6, FieldType.blackKnight);
+        changeField(0, 7, FieldType.blackRook);
         
-        this.changeField(7, 0, FieldType.whiteRook);
-        this.changeField(7, 1, FieldType.whiteKnight);
-        this.changeField(7, 2, FieldType.whiteBishop);
-        this.changeField(7, 3, FieldType.whiteQueen);
-        this.changeField(7, 4, FieldType.whiteKing);
-        this.changeField(7, 5, FieldType.whiteBishop);
-        this.changeField(7, 6, FieldType.whiteKnight);
-        this.changeField(7, 7, FieldType.whiteRook);
+        changeField(7, 0, FieldType.whiteRook);
+        changeField(7, 1, FieldType.whiteKnight);
+        changeField(7, 2, FieldType.whiteBishop);
+        changeField(7, 3, FieldType.whiteQueen);
+        changeField(7, 4, FieldType.whiteKing);
+        changeField(7, 5, FieldType.whiteBishop);
+        changeField(7, 6, FieldType.whiteKnight);
+        changeField(7, 7, FieldType.whiteRook);
     };
     
     this.move = function(sourceRank, sourceFile, destRank, destFile) {
-        sourceType = fields[sourceRank][sourceFile];
-        this.changeField(sourceRank, sourceFile, FieldType.empty);
-        this.changeField(destRank, destFile, sourceType);
+        var sourceType = fields[sourceRank][sourceFile];
+        changeField(sourceRank, sourceFile, FieldType.empty);
+        changeField(destRank, destFile, sourceType);
     };
-    
-    this.changeField = function(rank, file, type) {
+
+    function changeField(rank, file, type) {
         fields[rank][file] = type;
         fieldChanged.raise({ rank: rank, file: file, type: type});
-    };
+    }
+
 }
