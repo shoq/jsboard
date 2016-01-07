@@ -2,30 +2,17 @@ function Renderer(chessboard, canvas, whiteSquareColor, blackSquareColor) {
 
     var context = canvas.getContext("2d");
 
-    var squareCount, boardSize, squareSize;
+    var squareCount, squareSize;
 
     function updateDimensions() {
         squareCount = chessboard.getSize();
-        boardSize = canvas.width;
+        var boardSize = canvas.width;
         squareSize = boardSize / squareCount;
     }
-    updateDimensions();
 
     function drawRawSquare(file, rank) {
         context.fillStyle = ((file + rank) % 2) ? blackSquareColor : whiteSquareColor;
         context.fillRect(file * squareSize, rank * squareSize, squareSize, squareSize);
-    }
-
-    var drawChessboard = this.drawChessboard = function () {
-
-        updateDimensions();
-
-        for(var file = 0; file < squareCount; ++file)
-        {
-            for(var rank = 0; rank < squareCount; ++rank) {
-                drawRawSquare(file, rank);
-            }
-        }
     }
 
     function drawField(rank, file, type) {
@@ -44,6 +31,18 @@ function Renderer(chessboard, canvas, whiteSquareColor, blackSquareColor) {
         img.onload = function () {
             context.drawImage(img, x, y);
         };
+    }
+
+    var drawChessboard = this.drawChessboard = function () {
+
+        updateDimensions();
+
+        for(var file = 0; file < squareCount; ++file)
+        {
+            for(var rank = 0; rank < squareCount; ++rank) {
+                drawRawSquare(file, rank);
+            }
+        }
     };
 
     var pieceImages = [
@@ -64,8 +63,10 @@ function Renderer(chessboard, canvas, whiteSquareColor, blackSquareColor) {
         return  "./images/" + name + ".png";
     });
 
+    drawChessboard();
+
     chessboard.onSizeChanged(function (board) {
-        drawChessboard(board);
+        drawChessboard();
     });
 
     chessboard.onFieldChanged(function (board, args) {
