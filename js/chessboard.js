@@ -112,4 +112,10 @@ function Chessboard(initialSize) {
         fieldChanged.raise({ rank: rank, file: file, type: type});
     }
 
+    this.getSquare = function(rank, file) {
+        var row = fields[rank] || [FieldType.empty];
+        var square = row[file] || FieldType.empty;
+        return square;
+    }
+
 }

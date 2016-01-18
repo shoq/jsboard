@@ -4,10 +4,10 @@ var chessboard;
 // Initialization
 window.onload = function() {
 
-    var canvas = document.getElementById("chessboardCanvas");
+    var boardControl = document.getElementById("chessdiv");
 
     chessboard = new Chessboard(8);
-    var renderer = new Renderer(chessboard, canvas, "#DDDDDD", "#555555");
+    var renderer = new HtmlRenderer(chessboard, boardControl);
 
     chessboard.resetToStandard();
 
@@ -39,5 +39,5 @@ window.onload = function() {
         reduceButton.disabled = !board.canReduce();
     });
 
-    renderer.drawChessboard();
+    renderer.assembleChessboard();
 };

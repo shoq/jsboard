@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <link rel="style.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
     <script src="js/chessboard.js"></script>
-    <script src="js/renderer.js"></script>
+    <script src="js/html-renderer.js"></script>
     <script src="js/init.js"></script>
     <script src="js/domain-event.js"></script>
 </head>
 <body>
 
-<canvas id="chessboardCanvas" width="500" height="500">
-    Your browser does not support HTML5 Canvas.
-</canvas>
+<div id="chessdiv"></div>
+
 <div>
     <button id="enlargeButton" content="+" onclick="chessboard.enlarge();">+</button>
     <button id="reduceButton" value="-" onclick="chessboard.reduce();">-</button>

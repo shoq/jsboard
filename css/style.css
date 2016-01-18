@@ -1,0 +1,23 @@
+#chessdiv {
+    background: yellow;
+    font-size: 0px; /* hide spaces between divs */
+    /* height and width are set dynamically in javascript based on square size */
+}
+
+#chessdiv div {
+    display: inline-block;
+    /* height and width are set dynamically in javascript */
+}
+
+#chessdiv div.black-square {
+    background: #DDDDDD;
+}
+
+#chessdiv div.white-square {
+    background: #555555;
+}
+
+img.piece {
+    max-width:100%;
+    max-height:100%;
+}
