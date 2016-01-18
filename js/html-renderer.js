@@ -1,11 +1,6 @@
-function HtmlRenderer(chessboard, boardControl) {
+function HtmlRenderer(chessboard, boardControl, pieceImageFileNames) {
 
     var squareSize = 50;
-
-    function sizeElement(element, sizeInPx) {
-        element.style.height = sizeInPx + 'px';
-        element.style.width = sizeInPx + 'px';
-    }
 
     function createSquare(rank, file) {
 
@@ -23,9 +18,7 @@ function HtmlRenderer(chessboard, boardControl) {
 
     var assembleChessboard = this.assembleChessboard = function () {
 
-        while (boardControl.firstChild) {
-            boardControl.removeChild(boardControl.firstChild);
-        }
+        removeAllChildren(boardControl);
 
         var newSize = chessboard.getSize();
         sizeElement(boardControl, squareSize * newSize);
@@ -40,28 +33,10 @@ function HtmlRenderer(chessboard, boardControl) {
         if(pieceType != 0) {
             var img = new Image();
             img.className = 'piece';
-            img.src = pieceImages[pieceType];
+            img.src = pieceImageFileNames[pieceType];
             square.appendChild(img);
         }
     }
-
-    var pieceImages = [
-        "", // just for the sake of index compatibility
-        "white-pawn",
-        "white-knight",
-        "white-bishop",
-        "white-rook",
-        "white-queen",
-        "white-king",
-        "black-pawn",
-        "black-knight",
-        "black-bishop",
-        "black-rook",
-        "black-queen",
-        "black-king"
-    ].map(function(name) {
-            return  "./images/" + name + ".png";
-        });
 
     chessboard.onFieldChanged(function (board, args) {
         assembleChessboard();
