@@ -43,6 +43,9 @@ function HtmlRenderer(chessboard, boardControl) {
         //fieldDiv.marginLeft = fieldDiv.marginTop = fieldDiv.marginRight = fieldDiv.marginBottom = 4;
         selectedRank = rank;
         selectedFile = file;
+        
+        var fieldDiv = getFieldDiv(rank, file);
+        fieldDiv.style.padding = "3px 3px 3px 3px";
     }
 
     function createFieldDiv(rank, file) {
@@ -54,7 +57,7 @@ function HtmlRenderer(chessboard, boardControl) {
         fieldImage.id = getFieldImageId(rank, file);
         fieldImage.className = 'field';
         fieldDiv.id = getFieldDivId(rank, file);
-        fieldDiv.onclick = function() { selectSquareDiv(fieldDiv, rank, file); };
+        fieldDiv.onclick = function() { selectSquareDiv(rank, file); };
         fieldDiv.className = isFieldWhite(rank, file) ? 'white-square' : 'black-square';
         fieldDiv.appendChild(fieldImage);
         
@@ -68,16 +71,20 @@ function HtmlRenderer(chessboard, boardControl) {
         fieldImage.src = FieldImageUrls[fieldType];
     }
     
+    function getFieldDiv(rank, file) {
+        return document.getElementById(getFieldDivId(rank, file));
+    }
+    
     function getFieldDivId(rank, file) {
         return 'f#' + rank + '#' + file;
     }
-
+    
     function getFieldImageId(rank, file) {
         return 'img#' + rank + '#' + file;
     }
     
     function isFieldWhite(rank, file) {
-        return (rank + file) % 2 == 1;
+        return (rank + file) % 2 == 0;
     }
 
     chessboard.onFieldChanged(function (board, args) {

@@ -9,12 +9,12 @@
     /* height and width are set dynamically in javascript */
 }
 
-#chessdiv div.black-square {
-    background: #DDDDDD;
+#chessdiv div.white-square {
+    background: #E0E0E0;
 }
 
-#chessdiv div.white-square {
-    background: #555555;
+#chessdiv div.black-square {
+    background: #808080;
 }
 
 img.field {
