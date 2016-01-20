@@ -18,7 +18,7 @@ var FieldImageUrls = [
     
 function HtmlRenderer(chessboard, boardControl) {
 
-    var fieldImageSize = 50;
+    var fieldImageSize = 64;
     var selectedRank = -1;
     var selectedFile = -1;
     
@@ -40,12 +40,23 @@ function HtmlRenderer(chessboard, boardControl) {
     };
     
     function selectSquareDiv(rank, file) {
-        //fieldDiv.marginLeft = fieldDiv.marginTop = fieldDiv.marginRight = fieldDiv.marginBottom = 4;
-        selectedRank = rank;
-        selectedFile = file;
-        
-        var fieldDiv = getFieldDiv(rank, file);
-        fieldDiv.style.padding = "3px 3px 3px 3px";
+
+        // If a field is clicked again, then it is deselected.
+        if (selectedRank == rank && selectedFile == file) {
+            selectedRank = -1;
+            selectedFile = -1;
+            getFieldImage(rank, file).className = 'fieldUnselected';
+        } else {
+            // If a different field was selected before, then it must be deselected.
+            if (selectedRank != -1 && selectedFile != -1) {
+                getFieldImage(selectedRank, selectedFile).className = 'fieldUnselected';
+            }
+            
+            // A newly clicked field must be selected.
+            selectedRank = rank;
+            selectedFile = file;
+            getFieldImage(rank, file).className = 'fieldSelected';
+        }
     }
 
     function createFieldDiv(rank, file) {
@@ -55,7 +66,7 @@ function HtmlRenderer(chessboard, boardControl) {
         var fieldDiv = document.createElement('div');
                 
         fieldImage.id = getFieldImageId(rank, file);
-        fieldImage.className = 'field';
+        fieldImage.className = 'fieldUnselected';
         fieldDiv.id = getFieldDivId(rank, file);
         fieldDiv.onclick = function() { selectSquareDiv(rank, file); };
         fieldDiv.className = isFieldWhite(rank, file) ? 'white-square' : 'black-square';
@@ -71,12 +82,12 @@ function HtmlRenderer(chessboard, boardControl) {
         fieldImage.src = FieldImageUrls[fieldType];
     }
     
-    function getFieldDiv(rank, file) {
-        return document.getElementById(getFieldDivId(rank, file));
-    }
-    
     function getFieldDivId(rank, file) {
         return 'f#' + rank + '#' + file;
+    }
+    
+    function getFieldImage(rank, file) {
+        return document.getElementById(getFieldImageId(rank, file));
     }
     
     function getFieldImageId(rank, file) {
@@ -88,7 +99,7 @@ function HtmlRenderer(chessboard, boardControl) {
     }
 
     chessboard.onFieldChanged(function (board, args) {
-        setFieldImageUrlBasedOnType(document.getElementById(args.rank, args.file), args.type);
+        setFieldImageUrlBasedOnType(getFieldImage(args.rank, args.file), args.type);
     });
 
     chessboard.onSizeChanged(function (board, args) {
