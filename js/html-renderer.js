@@ -46,15 +46,19 @@ function HtmlRenderer(chessboard, boardControl) {
             selectedFile = -1;
             getFieldImage(rank, file).className = 'field-unselected';
         } else {
-            // If a different field was selected before, then it must be deselected.
+            // If a different field was selected before, then it must be deselected and a move must be made.
             if (selectedRank != -1 && selectedFile != -1) {
-                getFieldImage(selectedRank, selectedFile).className = 'field-unselected';
-            }
-            
+                if (chessboard.tryToMove(selectedRank, selectedFile, rank, file)) {
+                    getFieldImage(selectedRank, selectedFile).className = 'field-unselected';
+                    selectedRank = -1;
+                    selectedFile = -1;
+                }
             // A newly clicked field must be selected.
-            selectedRank = rank;
-            selectedFile = file;
-            getFieldImage(rank, file).className = 'field-selected';
+            } else {
+                selectedRank = rank;
+                selectedFile = file;
+                getFieldImage(rank, file).className = 'field-selected';
+            }
         }
     }
     

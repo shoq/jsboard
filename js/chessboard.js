@@ -111,10 +111,11 @@ function Chessboard(initialSize) {
         return fields[rank][file];
     }
     
-    this.move = function(sourceRank, sourceFile, destRank, destFile) {
+    this.tryToMove = function(sourceRank, sourceFile, destRank, destFile) {
         var sourceType = fields[sourceRank][sourceFile];
         changeField(sourceRank, sourceFile, FieldType.empty);
         changeField(destRank, destFile, sourceType);
+        return true;
     };
 
     function changeField(rank, file, type) {
