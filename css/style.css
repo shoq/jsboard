@@ -22,13 +22,13 @@ div.rank {
     width: 100%;
 }
 
-img.field-unselected {
+img.square-unselected {
     border-width: 3px;
     border-color: transparent;
     border-style: solid;
 }
 
-img.field-selected {
+img.square-selected {
     border-width: 3px;
     border-color: yellow;
     border-style: solid;

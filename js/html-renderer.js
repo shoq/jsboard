@@ -1,4 +1,4 @@
-var FieldImageUrls = [
+var SquareImageUrls = [
     "empty",
     "white-pawn",
     "white-knight",
@@ -21,9 +21,9 @@ function HtmlRenderer(chessboard, boardControl) {
     var selectedRank = -1;
     var selectedFile = -1;
     
-    rebuildFieldDivs();
+    rebuildSquareDivs();
 
-    function rebuildFieldDivs() {
+    function rebuildSquareDivs() {
         removeAllChildren(boardControl);
 
         var newChessboardSize = chessboard.getSize();
@@ -31,7 +31,7 @@ function HtmlRenderer(chessboard, boardControl) {
         for (var rank = 0; rank < newChessboardSize; ++rank) {
             var rankDiv = createRankDiv();
             for (var file = 0; file < newChessboardSize; ++file) {
-                rankDiv.appendChild(createFieldDiv(rank, file));
+                rankDiv.appendChild(createSquareDiv(rank, file));
             }
 
             boardControl.appendChild(rankDiv);
@@ -40,24 +40,24 @@ function HtmlRenderer(chessboard, boardControl) {
     
     function selectSquareDiv(rank, file) {
 
-        // If a field is clicked again, then it is deselected.
+        // If a square is clicked again, then it is deselected.
         if (selectedRank == rank && selectedFile == file) {
             selectedRank = -1;
             selectedFile = -1;
-            getFieldImage(rank, file).className = 'field-unselected';
+            getSquareImage(rank, file).className = 'square-unselected';
         } else {
-            // If a different field was selected before, then it must be deselected and a move must be made.
+            // If a different square was selected before, then it must be deselected and a move must be made.
             if (selectedRank != -1 && selectedFile != -1) {
                 if (chessboard.tryToMove(selectedRank, selectedFile, rank, file)) {
-                    getFieldImage(selectedRank, selectedFile).className = 'field-unselected';
+                    getSquareImage(selectedRank, selectedFile).className = 'square-unselected';
                     selectedRank = -1;
                     selectedFile = -1;
                 }
-            // A newly clicked field must be selected.
+            // A newly clicked square must be selected.
             } else {
                 selectedRank = rank;
                 selectedFile = file;
-                getFieldImage(rank, file).className = 'field-selected';
+                getSquareImage(rank, file).className = 'square-selected';
             }
         }
     }
@@ -68,45 +68,45 @@ function HtmlRenderer(chessboard, boardControl) {
         return rankDiv;
     }
 
-    function createFieldDiv(rank, file) {
+    function createSquareDiv(rank, file) {
 
-        var fieldType = chessboard.getFieldType(rank, file);
-        var fieldImage = new Image();
-        var fieldDiv = document.createElement('div');
+        var squareType = chessboard.getSquareType(rank, file);
+        var squareImage = new Image();
+        var squareDiv = document.createElement('div');
                 
-        fieldImage.id = getFieldImageId(rank, file);
-        fieldImage.className = 'field-unselected';
-        fieldDiv.onclick = function() { selectSquareDiv(rank, file); };
-        fieldDiv.className = isFieldWhite(rank, file) ? 'white-square' : 'black-square';
-        fieldDiv.appendChild(fieldImage);
+        squareImage.id = getSquareImageId(rank, file);
+        squareImage.className = 'square-unselected';
+        squareDiv.onclick = function() { selectSquareDiv(rank, file); };
+        squareDiv.className = isSquareWhite(rank, file) ? 'white-square' : 'black-square';
+        squareDiv.appendChild(squareImage);
         
-        setFieldImageUrlBasedOnType(fieldImage, fieldType);
+        setSquareImageUrlBasedOnType(squareImage, squareType);
 
-        return fieldDiv;
+        return squareDiv;
     }
 
-    function setFieldImageUrlBasedOnType(fieldImage, fieldType) {
-        fieldImage.src = FieldImageUrls[fieldType];
+    function setSquareImageUrlBasedOnType(squareImage, squareType) {
+        squareImage.src = SquareImageUrls[squareType];
     }
     
-    function getFieldImage(rank, file) {
-        return document.getElementById(getFieldImageId(rank, file));
+    function getSquareImage(rank, file) {
+        return document.getElementById(getSquareImageId(rank, file));
     }
     
-    function getFieldImageId(rank, file) {
+    function getSquareImageId(rank, file) {
         return 'img#' + rank + '#' + file;
     }
     
-    function isFieldWhite(rank, file) {
+    function isSquareWhite(rank, file) {
         return (rank + file) % 2 == 0;
     }
 
-    chessboard.onFieldChanged(function (board, args) {
-        setFieldImageUrlBasedOnType(getFieldImage(args.rank, args.file), args.type);
+    chessboard.onSquareChanged(function (board, args) {
+        setSquareImageUrlBasedOnType(getSquareImage(args.rank, args.file), args.type);
     });
 
     chessboard.onSizeChanged(function (board, args) {
-        rebuildFieldDivs();
+        rebuildSquareDivs();
     });
 
 };
