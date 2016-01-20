@@ -117,7 +117,7 @@ function Chessboard(initialSize) {
         return squares[rank][file];
     }
     
-    this.getPlayerColor = function(rank, file) {
+    var getPlayerColor = this.getPlayerColor = function(rank, file) {
         switch (squares[rank][file]) {
             case SquareType.empty:
                 return PlayerColor.unspecified;
@@ -146,7 +146,7 @@ function Chessboard(initialSize) {
             return true;
         }
         
-        if (!pieceAimsAt(sourceRank, sourceFile, destRank, destFile)) {
+        if (!canMoveTo(sourceRank, sourceFile, destRank, destFile)) {
             return false;
         }
 
@@ -169,12 +169,17 @@ function Chessboard(initialSize) {
         return rank;
     }
     
-    function pieceAimsAt(sourceRank, sourceFile, destRank, destFile) {
+    function canMoveTo(sourceRank, sourceFile, destRank, destFile) {
 
         var squareType = getSquareType(sourceRank, sourceFile);
         switch (squareType) {
             case SquareType.empty:
                 return false;
+            
+            case SquareType.whitePawn:
+                return isPawnMove(sourceRank, sourceFile, destRank, destFile, false);
+            case SquareType.blackPawn:
+                return isPawnMove(sourceRank, sourceFile, destRank, destFile, true);
 
             case SquareType.whiteKnight:
             case SquareType.blackKnight:
@@ -193,9 +198,66 @@ function Chessboard(initialSize) {
                 return isCrossMove(sourceRank, sourceFile, destRank, destFile)
                     || isLineMove(sourceRank, sourceFile, destRank, destFile);
 
+            case SquareType.whiteKing:
+            case SquareType.blackKing:
+                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);
+                    
             default:
                 return true;
         }
+    }
+    
+    function getStartPawnRank(flipSides) {
+        return flipSides ? 1 : squares.length - 2;
+    }
+    
+    function isPawnMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+        return isPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides)
+            || isPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides);
+    }
+    
+    function isPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+        if (getPlayerColor(destRank, destFile) != PlayerColor.unspecified) {
+            return false;
+        }
+        
+        if (sourceFile != destFile) {
+            return false;
+        }
+        
+        var rankDiff = sourceRank - destRank;
+        if (rankDiff == adjustPawnMoveRankDiff(1, flipSides)) {
+            return true;
+        }
+        
+        if (sourceRank == getStartPawnRank(flipSides) && rankDiff == adjustPawnMoveRankDiff(2, flipSides)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function isPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+        var sourceColor = getPlayerColor(sourceRank, sourceFile);
+        var destColor = getPlayerColor(destRank, destFile);
+        if (destColor == PlayerColor.unspecified || sourceColor == destColor) {
+            return false;
+        }
+        
+        if (Math.abs(destFile - sourceFile) != 1) {
+            return false;
+        }
+        
+        var rankDiff = sourceRank - destRank;
+        if (rankDiff == adjustPawnMoveRankDiff(1, flipSides)) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    function adjustPawnMoveRankDiff(rankDist, flipSides) {
+        return flipSides ? -rankDist : rankDist;
     }
     
     function isCrossMove(sourceRank, sourceFile, destRank, destFile) {
@@ -210,5 +272,11 @@ function Chessboard(initialSize) {
         var distRank = Math.abs(destRank - sourceRank);
         var distFile = Math.abs(destFile - sourceFile);
         return (distRank == 2 && distFile == 1) || (distRank == 1 && distFile == 2);
+    }
+
+    function isOneSquareMove(sourceRank, sourceFile, destRank, destFile) {
+        var distRank = Math.abs(destRank - sourceRank);
+        var distFile = Math.abs(destFile - sourceFile);
+        return distRank <= 1 && distFile <= 1;
     }
 }
