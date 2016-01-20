@@ -1,29 +1,34 @@
-#chessdiv {
-    background: fuchsia;
-    font-size: 0px; /* hide spaces between divs */
-    /* height and width are set dynamically in javascript based on square size */
+#board-div {
+    display: block;
+    font-size: 0px; /* Hides spaces between divs. */
 }
 
-#chessdiv div {
+#board-div div {
     display: inline-block;
-    /* height and width are set dynamically in javascript */
+    border-style: none;
+    min-width: 0;
 }
 
-#chessdiv div.white-square {
+#board-div div.white-square {
     background: #E0E0E0;
 }
 
-#chessdiv div.black-square {
+#board-div div.black-square {
     background: #808080;
 }
 
-img.fieldUnselected {
+div.rank {
+    display: block;
+    width: 100%;
+}
+
+img.field-unselected {
     border-width: 3px;
     border-color: transparent;
     border-style: solid;
 }
 
-img.fieldSelected {
+img.field-selected {
     border-width: 3px;
     border-color: yellow;
     border-style: solid;

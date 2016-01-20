@@ -18,7 +18,6 @@ var FieldImageUrls = [
     
 function HtmlRenderer(chessboard, boardControl) {
 
-    var fieldImageSize = 64;
     var selectedRank = -1;
     var selectedFile = -1;
     
@@ -28,14 +27,14 @@ function HtmlRenderer(chessboard, boardControl) {
         removeAllChildren(boardControl);
 
         var newChessboardSize = chessboard.getSize();
-        var newFieldCount = newChessboardSize * newChessboardSize;
-        
-        setSquareSize(boardControl, fieldImageSize * newChessboardSize);
 
         for (var rank = 0; rank < newChessboardSize; ++rank) {
+            var rankDiv = createRankDiv();
             for (var file = 0; file < newChessboardSize; ++file) {
-                boardControl.appendChild(createFieldDiv(rank, file));
+                rankDiv.appendChild(createFieldDiv(rank, file));
             }
+
+            boardControl.appendChild(rankDiv);
         }
     };
     
@@ -45,18 +44,24 @@ function HtmlRenderer(chessboard, boardControl) {
         if (selectedRank == rank && selectedFile == file) {
             selectedRank = -1;
             selectedFile = -1;
-            getFieldImage(rank, file).className = 'fieldUnselected';
+            getFieldImage(rank, file).className = 'field-unselected';
         } else {
             // If a different field was selected before, then it must be deselected.
             if (selectedRank != -1 && selectedFile != -1) {
-                getFieldImage(selectedRank, selectedFile).className = 'fieldUnselected';
+                getFieldImage(selectedRank, selectedFile).className = 'field-unselected';
             }
             
             // A newly clicked field must be selected.
             selectedRank = rank;
             selectedFile = file;
-            getFieldImage(rank, file).className = 'fieldSelected';
+            getFieldImage(rank, file).className = 'field-selected';
         }
+    }
+    
+    function createRankDiv() {
+        var rankDiv = document.createElement('div');
+        rankDiv.className = 'rank';
+        return rankDiv;
     }
 
     function createFieldDiv(rank, file) {
@@ -66,13 +71,12 @@ function HtmlRenderer(chessboard, boardControl) {
         var fieldDiv = document.createElement('div');
                 
         fieldImage.id = getFieldImageId(rank, file);
-        fieldImage.className = 'fieldUnselected';
+        fieldImage.className = 'field-unselected';
         fieldDiv.id = getFieldDivId(rank, file);
         fieldDiv.onclick = function() { selectSquareDiv(rank, file); };
         fieldDiv.className = isFieldWhite(rank, file) ? 'white-square' : 'black-square';
         fieldDiv.appendChild(fieldImage);
         
-        setSquareSize(fieldDiv, fieldImageSize);
         setFieldImageUrlBasedOnType(fieldImage, fieldType);
 
         return fieldDiv;
