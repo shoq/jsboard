@@ -1,5 +1,5 @@
 #chessdiv {
-    background: yellow;
+    background: fuchsia;
     font-size: 0px; /* hide spaces between divs */
     /* height and width are set dynamically in javascript based on square size */
 }
@@ -17,7 +17,7 @@
     background: #555555;
 }
 
-img.piece {
-    max-width:100%;
-    max-height:100%;
+img.field {
+    max-width: 100%;
+    max-height: 100%;
 }

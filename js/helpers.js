@@ -1,4 +1,4 @@
-function sizeElement(element, sizeInPx) {
+function setSquareSize(element, sizeInPx) {
     element.style.height = sizeInPx + 'px';
     element.style.width = sizeInPx + 'px';
 }

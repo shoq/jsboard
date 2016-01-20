@@ -21,19 +21,15 @@ function Chessboard(initialSize) {
     var minSize = 2;
     var maxSize = 16;
     var standardSize = 8;
-    var size = initialSize;
     var fields = [];
     
-    for (var i = 0; i < size; ++i) {
-        var file = [];
-        for (j = 0; j < size; ++j) {
-            file.push(FieldType.empty);
-        }
-        fields.push(file);
+    for (var i = 0; i < initialSize; ++i) {
+        fields.push(createEmptyRank(initialSize));
     }
 
     this.getSize = function() {
-        return size;
+        // Returns the number of ranks which should be always the same as the number of files.
+        return fields.length;
     };
 
     var sizeChanged = new DomainEvent('sizeChanged', this);
@@ -43,18 +39,23 @@ function Chessboard(initialSize) {
     this.onFieldChanged = fieldChanged.subscribe;
 
     this.canEnlarge = function() {
-        return size < maxSize;
+        return this.getSize() < maxSize;
     };
 
     this.canReduce = function() {
-        return size > minSize;
+        return this.getSize() > minSize;
     };
 
     this.enlarge = function() {
         if (!this.canEnlarge()) {
             throw new Error('Cannot enlarge, because maximum size has been reached.');
         }
-        ++size;
+        
+        fields.push(createEmptyRank(fields.length));
+        for (var rank = 0; rank < fields.length; ++rank) {
+            fields[rank].push(FieldType.empty);
+        }
+
         sizeChanged.raise(null);
     };
 
@@ -62,12 +63,17 @@ function Chessboard(initialSize) {
         if (!this.canReduce()) {
             throw new Error('Cannot reduce, because minimum size has been reached.');
         }
-        --size;
+        
+        fields.pop();
+        for (var rank = 0; rank < fields.length; ++rank) {
+            fields[rank].pop();
+        }
+
         sizeChanged.raise(null);
     };
 
     this.resetToStandard = function() {
-        if (size != standardSize) {
+        if (fields.length != standardSize) {
             throw new Error('Chessboard must be of the standard 8x8 size.');
         }
         
@@ -100,6 +106,10 @@ function Chessboard(initialSize) {
         changeField(7, 6, FieldType.whiteKnight);
         changeField(7, 7, FieldType.whiteRook);
     };
+
+    this.getFieldType = function(rank, file) {
+        return fields[rank][file];
+    }
     
     this.move = function(sourceRank, sourceFile, destRank, destFile) {
         var sourceType = fields[sourceRank][sourceFile];
@@ -112,10 +122,13 @@ function Chessboard(initialSize) {
         fieldChanged.raise({ rank: rank, file: file, type: type});
     }
 
-    this.getSquare = function(rank, file) {
-        var row = fields[rank] || [FieldType.empty];
-        var square = row[file] || FieldType.empty;
-        return square;
+    function createEmptyRank(size) {
+        var rank = [];
+        for (j = 0; j < size; ++j) {
+            rank.push(FieldType.empty);
+        }
+
+        return rank;
     }
 
 }
