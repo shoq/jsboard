@@ -113,6 +113,10 @@ function Chessboard(initialSize) {
     
     this.tryToMove = function(sourceRank, sourceFile, destRank, destFile) {
         var sourceType = fields[sourceRank][sourceFile];
+        if (sourceType == FieldType.empty) {
+            return true;
+        }
+
         changeField(sourceRank, sourceFile, FieldType.empty);
         changeField(destRank, destFile, sourceType);
         return true;

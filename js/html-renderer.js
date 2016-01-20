@@ -76,7 +76,6 @@ function HtmlRenderer(chessboard, boardControl) {
                 
         fieldImage.id = getFieldImageId(rank, file);
         fieldImage.className = 'field-unselected';
-        fieldDiv.id = getFieldDivId(rank, file);
         fieldDiv.onclick = function() { selectSquareDiv(rank, file); };
         fieldDiv.className = isFieldWhite(rank, file) ? 'white-square' : 'black-square';
         fieldDiv.appendChild(fieldImage);
@@ -88,10 +87,6 @@ function HtmlRenderer(chessboard, boardControl) {
 
     function setFieldImageUrlBasedOnType(fieldImage, fieldType) {
         fieldImage.src = FieldImageUrls[fieldType];
-    }
-    
-    function getFieldDivId(rank, file) {
-        return 'f#' + rank + '#' + file;
     }
     
     function getFieldImage(rank, file) {
