@@ -48,16 +48,23 @@ function HtmlRenderer(chessboard, boardControl) {
         } else {
             // If a different square was selected before, then it must be deselected and a move must be made.
             if (selectedRank != -1 && selectedFile != -1) {
-                if (chessboard.tryToMove(selectedRank, selectedFile, rank, file)) {
+                if (chessboard.getPlayerColor(selectedRank, selectedFile) != chessboard.getPlayerColor(rank, file)) {
+                    if (chessboard.tryToMove(selectedRank, selectedFile, rank, file)) {
+                        getSquareImage(selectedRank, selectedFile).className = 'square-unselected';
+                        selectedRank = -1;
+                        selectedFile = -1;
+                    }
+                } else {
                     getSquareImage(selectedRank, selectedFile).className = 'square-unselected';
-                    selectedRank = -1;
-                    selectedFile = -1;
+                    getSquareImage(rank, file).className = 'square-selected';
+                    selectedRank = rank;
+                    selectedFile = file;
                 }
             // A newly clicked square must be selected.
             } else {
+                getSquareImage(rank, file).className = 'square-selected';
                 selectedRank = rank;
                 selectedFile = file;
-                getSquareImage(rank, file).className = 'square-selected';
             }
         }
     }

@@ -16,6 +16,12 @@ var SquareType = {
     blackKing: 12
 };
 
+var PlayerColor = {
+    unspecified : 0,
+    white : 1,
+    black : 2
+};
+
 function Chessboard(initialSize) {
 
     var minSize = 2;
@@ -107,14 +113,41 @@ function Chessboard(initialSize) {
         changeSquare(7, 7, SquareType.whiteRook);
     };
 
-    this.getSquareType = function(rank, file) {
+    var getSquareType = this.getSquareType = function(rank, file) {
         return squares[rank][file];
+    }
+    
+    this.getPlayerColor = function(rank, file) {
+        switch (squares[rank][file]) {
+            case SquareType.empty:
+                return PlayerColor.unspecified;
+
+            case SquareType.whitePawn:
+            case SquareType.whiteKnight:
+            case SquareType.whiteBishop:
+            case SquareType.whiteRook:
+            case SquareType.whiteQueen:
+            case SquareType.whiteKing:
+                return PlayerColor.white;
+
+            case SquareType.blackPawn:
+            case SquareType.blackKnight:
+            case SquareType.blackBishop:
+            case SquareType.blackRook:
+            case SquareType.blackQueen:
+            case SquareType.blackKing:
+                return PlayerColor.black;
+        };
     }
     
     this.tryToMove = function(sourceRank, sourceFile, destRank, destFile) {
         var sourceType = squares[sourceRank][sourceFile];
         if (sourceType == SquareType.empty) {
             return true;
+        }
+        
+        if (!pieceAimsAt(sourceRank, sourceFile, destRank, destFile)) {
+            return false;
         }
 
         changeSquare(sourceRank, sourceFile, SquareType.empty);
@@ -135,5 +168,47 @@ function Chessboard(initialSize) {
 
         return rank;
     }
+    
+    function pieceAimsAt(sourceRank, sourceFile, destRank, destFile) {
 
+        var squareType = getSquareType(sourceRank, sourceFile);
+        switch (squareType) {
+            case SquareType.empty:
+                return false;
+
+            case SquareType.whiteKnight:
+            case SquareType.blackKnight:
+                return isJumpMove(sourceRank, sourceFile, destRank, destFile);
+
+            case SquareType.whiteBishop:
+            case SquareType.blackBishop:
+                return isCrossMove(sourceRank, sourceFile, destRank, destFile);
+                
+            case SquareType.whiteRook:
+            case SquareType.blackRook:
+                return isLineMove(sourceRank, sourceFile, destRank, destFile);
+
+            case SquareType.whiteQueen:
+            case SquareType.blackQueen:
+                return isCrossMove(sourceRank, sourceFile, destRank, destFile)
+                    || isLineMove(sourceRank, sourceFile, destRank, destFile);
+
+            default:
+                return true;
+        }
+    }
+    
+    function isCrossMove(sourceRank, sourceFile, destRank, destFile) {
+        return Math.abs(destRank - sourceRank) == Math.abs(destFile - sourceFile); 
+    }
+    
+    function isLineMove(sourceRank, sourceFile, destRank, destFile) {
+        return sourceRank == destRank || sourceFile == destFile;
+    }
+    
+    function isJumpMove(sourceRank, sourceFile, destRank, destFile) {
+        var distRank = Math.abs(destRank - sourceRank);
+        var distFile = Math.abs(destFile - sourceFile);
+        return (distRank == 2 && distFile == 1) || (distRank == 1 && distFile == 2);
+    }
 }
