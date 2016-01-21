@@ -146,7 +146,7 @@ function Chessboard(initialSize) {
             return true;
         }
         
-        if (!canMoveTo(sourceRank, sourceFile, destRank, destFile)) {
+        if (!isValidMove(sourceRank, sourceFile, destRank, destFile)) {
             return false;
         }
 
@@ -169,7 +169,7 @@ function Chessboard(initialSize) {
         return rank;
     }
     
-    function canMoveTo(sourceRank, sourceFile, destRank, destFile) {
+    function isValidMove(sourceRank, sourceFile, destRank, destFile) {
 
         var squareType = getSquareType(sourceRank, sourceFile);
         switch (squareType) {
@@ -177,26 +177,26 @@ function Chessboard(initialSize) {
                 return false;
             
             case SquareType.whitePawn:
-                return isPawnMove(sourceRank, sourceFile, destRank, destFile, false);
+                return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, false);
             case SquareType.blackPawn:
-                return isPawnMove(sourceRank, sourceFile, destRank, destFile, true);
+                return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, true);
 
             case SquareType.whiteKnight:
             case SquareType.blackKnight:
-                return isJumpMove(sourceRank, sourceFile, destRank, destFile);
+                return isValidJumpMove(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteBishop:
             case SquareType.blackBishop:
-                return isCrossMove(sourceRank, sourceFile, destRank, destFile);
+                return isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile);
                 
             case SquareType.whiteRook:
             case SquareType.blackRook:
-                return isLineMove(sourceRank, sourceFile, destRank, destFile);
+                return isValidLineMove(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteQueen:
             case SquareType.blackQueen:
-                return isCrossMove(sourceRank, sourceFile, destRank, destFile)
-                    || isLineMove(sourceRank, sourceFile, destRank, destFile);
+                return isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile)
+                    || isValidLineMove(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteKing:
             case SquareType.blackKing:
@@ -207,16 +207,12 @@ function Chessboard(initialSize) {
         }
     }
     
-    function getStartPawnRank(flipSides) {
-        return flipSides ? 1 : squares.length - 2;
+    function isValidPawnMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+        return isValidPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides)
+            || isValidPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides);
     }
     
-    function isPawnMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
-        return isPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides)
-            || isPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides);
-    }
-    
-    function isPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+    function isValidPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
         if (getPlayerColor(destRank, destFile) != PlayerColor.unspecified) {
             return false;
         }
@@ -237,7 +233,7 @@ function Chessboard(initialSize) {
         return false;
     }
     
-    function isPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
+    function isValidPawnAttackingMove(sourceRank, sourceFile, destRank, destFile, flipSides) {
         var sourceColor = getPlayerColor(sourceRank, sourceFile);
         var destColor = getPlayerColor(destRank, destFile);
         if (destColor == PlayerColor.unspecified || sourceColor == destColor) {
@@ -256,27 +252,84 @@ function Chessboard(initialSize) {
         return false;
     }
     
-    function adjustPawnMoveRankDiff(rankDist, flipSides) {
-        return flipSides ? -rankDist : rankDist;
+    function isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile) {
+        return isDiagonalMove(sourceRank, sourceFile, destRank, destFile)
+            && isDiagonalOpen(sourceRank, sourceFile, destRank, destFile);
     }
     
-    function isCrossMove(sourceRank, sourceFile, destRank, destFile) {
-        return Math.abs(destRank - sourceRank) == Math.abs(destFile - sourceFile); 
+    function isValidLineMove(sourceRank, sourceFile, destRank, destFile) {
+        return isLineMove(sourceRank, sourceFile, destRank, destFile)
+            && isLineOpen(sourceRank, sourceFile, destRank, destFile);
     }
     
-    function isLineMove(sourceRank, sourceFile, destRank, destFile) {
-        return sourceRank == destRank || sourceFile == destFile;
-    }
-    
-    function isJumpMove(sourceRank, sourceFile, destRank, destFile) {
+    function isValidJumpMove(sourceRank, sourceFile, destRank, destFile) {
         var distRank = Math.abs(destRank - sourceRank);
         var distFile = Math.abs(destFile - sourceFile);
         return (distRank == 2 && distFile == 1) || (distRank == 1 && distFile == 2);
     }
-
+    
     function isOneSquareMove(sourceRank, sourceFile, destRank, destFile) {
         var distRank = Math.abs(destRank - sourceRank);
         var distFile = Math.abs(destFile - sourceFile);
         return distRank <= 1 && distFile <= 1;
     }
+    
+    function isDiagonalMove(sourceRank, sourceFile, destRank, destFile) {
+        return Math.abs(destRank - sourceRank) == Math.abs(destFile - sourceFile);
+    }
+
+    function isLineMove(sourceRank, sourceFile, destRank, destFile) {
+        return sourceRank == destRank || sourceFile == destFile;
+    }
+    
+    function isDiagonalOpen(sourceRank, sourceFile, destRank, destFile) {
+        var minRank = Math.min(sourceRank, destRank);
+        var maxRank = Math.max(sourceRank, destRank);
+        var minFile = Math.min(sourceFile, destFile);
+        
+        var dist = maxRank - minRank; // Should be the same for files and ranks.
+        
+        for (var i = 1; i < dist; ++i) {
+            if (getPlayerColor(minRank + i, minFile + i) != PlayerColor.unspecified) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    function isLineOpen(sourceRank, sourceFile, destRank, destFile) {
+        var minRank = Math.min(sourceRank, destRank);
+        var maxRank = Math.max(sourceRank, destRank);
+        var minFile = Math.min(sourceFile, destFile);
+        var maxFile = Math.max(sourceFile, destFile);
+        
+        var distRank = maxRank - minRank;
+        var distFile = maxFile - minFile;
+        
+        if (distFile == 0) {
+            for (var i = 1; i < distRank; ++i) {
+                if (getPlayerColor(minRank + i, minFile) != PlayerColor.unspecified) {
+                    return false;
+                }
+            }
+        } else {
+            for (var i = 1; i < distFile; ++i) {
+                if (getPlayerColor(minRank, minFile + i) != PlayerColor.unspecified) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    function getStartPawnRank(flipSides) {
+        return flipSides ? 1 : squares.length - 2;
+    }
+    
+    function adjustPawnMoveRankDiff(rankDist, flipSides) {
+        return flipSides ? -rankDist : rankDist;
+    }
+    
 }
