@@ -286,7 +286,6 @@ function Chessboard(initialSize) {
         var minRank = Math.min(sourceRank, destRank);
         var maxRank = Math.max(sourceRank, destRank);
         var minFile = Math.min(sourceFile, destFile);
-        var maxFile = Math.max(sourceFile, destFile);
         
         var dist = maxRank - minRank; // Should be the same for files and ranks.
         
