@@ -1,6 +1,6 @@
 #board-div {
     display: block;
-    font-size: 0px; /* Hides spaces between divs. */
+    font-size: 0; /* Hides spaces between divs. */
 }
 
 #board-div div {
@@ -23,13 +23,9 @@ div.rank {
 }
 
 img.square-unselected {
-    border-width: 3px;
-    border-color: transparent;
-    border-style: solid;
+    border: 3px solid transparent;
 }
 
 img.square-selected {
-    border-width: 3px;
-    border-color: yellow;
-    border-style: solid;
+    border: 3px solid yellow;
 }
