@@ -115,7 +115,7 @@ function Chessboard(initialSize) {
 
     var getSquareType = this.getSquareType = function(rank, file) {
         return squares[rank][file];
-    }
+    };
     
     var getPlayerColor = this.getPlayerColor = function(rank, file) {
         switch (squares[rank][file]) {
@@ -137,8 +137,8 @@ function Chessboard(initialSize) {
             case SquareType.blackQueen:
             case SquareType.blackKing:
                 return PlayerColor.black;
-        };
-    }
+        }
+    };
     
     this.tryToMove = function(sourceRank, sourceFile, destRank, destFile) {
         var sourceType = squares[sourceRank][sourceFile];

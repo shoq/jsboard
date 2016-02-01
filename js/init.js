@@ -16,6 +16,7 @@ window.onload = function() {
         var reduceButton = document.getElementById("reduceButton");
         reduceButton.disabled = !board.canReduce();
     });
-    
-    var renderer = new HtmlRenderer(chessboard, boardControl);
+
+    var mouseDriver = new MouseDriver(chessboard);
+    var renderer = new HtmlRenderer(chessboard, boardControl, mouseDriver);
 };
