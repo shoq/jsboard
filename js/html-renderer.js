@@ -82,6 +82,22 @@ function HtmlRenderer(chessboard, boardControl, mouseDriver) {
         rebuildSquareDivs();
     });
 
+    chessboard.onGameEnded(function (board, endType) {
+        var message = '';
+        switch(endType) {
+            case GameEndType.whiteWin:
+                message = 'White win!';
+                break;
+            case GameEndType.blackWin:
+                message = 'Black win!';
+                break;
+            case GameEndType.draw:
+                message = 'Draw!';
+                break;
+        }
+        alert(message);
+    });
+
     mouseDriver.onSquareSelected(function(sender, args) {
         getSquareImage(args.rank, args.file).className = 'square-selected';
     });

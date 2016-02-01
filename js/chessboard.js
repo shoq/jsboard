@@ -22,6 +22,12 @@ var PlayerColor = {
     black : 2
 };
 
+var GameEndType = {
+    whiteWin: 0,
+    blackWin : 1,
+    draw : 2
+};
+
 function Chessboard(initialSize) {
 
     var minSize = 2;
@@ -40,9 +46,11 @@ function Chessboard(initialSize) {
 
     var sizeChanged = new DomainEvent('sizeChanged', this);
     var squareChanged = new DomainEvent('squareChanged', this);
-    
+    var gameEnded = new DomainEvent('gameEnded', this);
+
     this.onSizeChanged = sizeChanged.subscribe;
     this.onSquareChanged = squareChanged.subscribe;
+    this.onGameEnded = gameEnded.subscribe;
 
     this.canEnlarge = function() {
         return this.getSize() < maxSize;
