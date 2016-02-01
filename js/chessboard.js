@@ -124,6 +124,16 @@ function Chessboard(initialSize) {
     var getSquareType = this.getSquareType = function(rank, file) {
         return squares[rank][file];
     };
+
+    var currentPlayerColor = PlayerColor.white;
+
+    function toggleCurrentPlayer() {
+        if(currentPlayerColor === PlayerColor.white) {
+            currentPlayerColor = PlayerColor.black;
+        } else {
+            currentPlayerColor = PlayerColor.white;
+        }
+    }
     
     var getPlayerColor = this.getPlayerColor = function(rank, file) {
         switch (squares[rank][file]) {
@@ -153,6 +163,10 @@ function Chessboard(initialSize) {
         if (sourceType == SquareType.empty) {
             return true;
         }
+
+        if(currentPlayerColor !== getPlayerColor(sourceRank, sourceFile)) {
+            return false;
+        }
         
         if (!isValidMove(sourceRank, sourceFile, destRank, destFile)) {
             return false;
@@ -160,6 +174,8 @@ function Chessboard(initialSize) {
 
         changeSquare(sourceRank, sourceFile, SquareType.empty);
         changeSquare(destRank, destFile, sourceType);
+
+        toggleCurrentPlayer();
         return true;
     };
 
