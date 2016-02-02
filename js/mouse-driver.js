@@ -7,9 +7,11 @@ function MouseDriver(chessboard) {
 
     var squareSelected = new DomainEvent('squareSelected', this);
     var squareUnselected = new DomainEvent('squareUnselected', this);
+    var pieceBoxUnselected = new DomainEvent('pieceBoxUnselected', this);
 
     this.onSquareSelected = squareSelected.subscribe;
     this.onSquareUnselected = squareUnselected.subscribe;
+    this.onPieceBoxUnselected = pieceBoxUnselected.subscribe;
 
     function unselectCurrent() {
         if(selectedRank != -1 && selectedFile != -1) {
@@ -17,6 +19,11 @@ function MouseDriver(chessboard) {
             selectedRank = -1;
             selectedFile = -1;
         }
+        if(selectedPieceType != -1) {
+            pieceBoxUnselected.raise(selectedPieceType);
+            console.log('sss');
+        }
+        selectedPieceType = -1;
     }
 
     function select(rank, file) {
@@ -34,7 +41,7 @@ function MouseDriver(chessboard) {
             // If a piece from piece box has been selected, it should  be placed on the chessboard
             if (selectedPieceType != -1) {
                 chessboard.addPiece(rank, file, selectedPieceType);
-                selectedPieceType = -1;
+                unselectCurrent();
             }
             // If a different square was selected before, then it must be deselected and a move must be made.
             else if (selectedRank != -1 && selectedFile != -1) {

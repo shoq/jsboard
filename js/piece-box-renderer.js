@@ -14,19 +14,28 @@ function PieceBoxRenderer(pieceBoxControl, mouseDriver) {
         SquareType.blackQueen
     ];
 
+    var selectedElement = null;
+
     function createElement() {
         return new Image();
     }
 
     function setImage(element, pieceType) {
         element.src = SquareImageUrls[pieceType];
+        element.className = "square-unselected";
     }
 
     function wireUpEvents(element, pieceType) {
         element.onclick = function() {
+            element.className = "square-selected";
             mouseDriver.selectPieceFromBox(pieceType);
+            selectedElement = element;
         }
     }
+
+    mouseDriver.onPieceBoxUnselected(function(pieceType) {
+        selectedElement.className = "square-unselected";
+    });
 
     piecesToDisplay.forEach(function(pieceType) {
         var element = createElement();
