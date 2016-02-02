@@ -149,19 +149,27 @@ function Chessboard(initialSize) {
                 return PlayerColor.unspecified;
 
             case SquareType.whitePawn:
+            case SquareType.whitePawnStarting:
+            case SquareType.whitePawnPassingBy:
             case SquareType.whiteKnight:
             case SquareType.whiteBishop:
             case SquareType.whiteRook:
+            case SquareType.whiteRookStarting:
             case SquareType.whiteQueen:
             case SquareType.whiteKing:
+            case SquareType.whiteKingStarting:
                 return PlayerColor.white;
 
             case SquareType.blackPawn:
+            case SquareType.blackPawnStarting:
+            case SquareType.blackPawnPassingBy:
             case SquareType.blackKnight:
             case SquareType.blackBishop:
             case SquareType.blackRook:
+            case SquareType.blackRookStarting:
             case SquareType.blackQueen:
             case SquareType.blackKing:
+            case SquareType.blackKingStarting:
                 return PlayerColor.black;
         }
     };
@@ -215,8 +223,12 @@ function Chessboard(initialSize) {
                 return false;
             
             case SquareType.whitePawn:
+            case SquareType.whitePawnStarting:
+            case SquareType.whitePawnPassingBy:
                 return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, false);
             case SquareType.blackPawn:
+            case SquareType.blackPawnStarting:
+            case SquareType.blackPawnPassingBy:
                 return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, true);
 
             case SquareType.whiteKnight:
@@ -228,7 +240,9 @@ function Chessboard(initialSize) {
                 return isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile);
                 
             case SquareType.whiteRook:
+            case SquareType.whiteRookStarting:
             case SquareType.blackRook:
+            case SquareType.blackRookStarting:
                 return isValidLineMove(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteQueen:
@@ -237,7 +251,9 @@ function Chessboard(initialSize) {
                     || isValidLineMove(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteKing:
+            case SquareType.whiteKingStarting:
             case SquareType.blackKing:
+            case SquareType.blackKingStarting:
                 return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);
                     
             default:
