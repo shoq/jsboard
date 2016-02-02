@@ -36,6 +36,10 @@ var GameEndType = {
     draw: 2
 };
 
+function flipPlayerColor(playerColor) {
+    return playerColor == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
+}
+
 function Chessboard(initialSize) {
 
     var minSize = 2;
@@ -145,11 +149,7 @@ function Chessboard(initialSize) {
     var currentPlayerColor = PlayerColor.white;
 
     function toggleCurrentPlayer() {
-        if (currentPlayerColor === PlayerColor.white) {
-            currentPlayerColor = PlayerColor.black;
-        } else {
-            currentPlayerColor = PlayerColor.white;
-        }
+        currentPlayerColor = flipPlayerColor(currentPlayerColor);
     }
     
     var getPlayerColor = this.getPlayerColor = function(rank, file) {
@@ -335,7 +335,21 @@ function Chessboard(initialSize) {
             return false;
         }
         
-        return !isSquareEmpty(destRank, destFile) && getPlayerColor(sourceRank, sourceFile) != getPlayerColor(destRank, destFile);
+        var playerColor = getPlayerColor(sourceRank, sourceFile);
+        var opponentColor = getPlayerColor(destRank, destFile);
+        
+        if (!isSquareEmpty(destRank, destFile) && playerColor != opponentColor) {
+            return true;
+        }
+        
+        var pawnPassingByType = getPawnPassingByType(flipPlayerColor(playerColor));
+        
+        if (isSquareEmpty(destRank, destFile) && testSquare(sourceRank, destFile, pawnPassingByType)) {
+            changeSquare(sourceRank, destFile, SquareType.empty);
+            return true;
+        }
+        
+        return false;
     }
     
     function isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile) {
@@ -442,10 +456,16 @@ function Chessboard(initialSize) {
         }
     }
     
+    function getPawnPassingByType(playerColor) {
+        return playerColor == PlayerColor.white
+            ? SquareType.whitePawnPassingBy
+            : SquareType.blackPawnPassingBy;
+    }
+
     function getDirection(source, dest) {
         return source <= dest ? 1 : -1;
     }
-    
+
     function getDistance(source, dest) {
         return Math.abs(dest - source)
     }
