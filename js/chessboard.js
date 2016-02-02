@@ -2,30 +2,38 @@ var SquareType = {
     empty: 0,
 
     whitePawn: 1,
-    whiteKnight: 2,
-    whiteBishop: 3,
-    whiteRook: 4,
-    whiteQueen: 5,
-    whiteKing: 6,
+    whitePawnStarting: 2,
+    whitePawnPassingBy: 3,
+    whiteKnight: 4,
+    whiteBishop: 5,
+    whiteRook: 6,
+    whiteRookStarting: 7,
+    whiteQueen: 8,
+    whiteKing: 9,
+    whiteKingStarting: 10,
 
-    blackPawn: 7,
-    blackKnight: 8,
-    blackBishop: 9,
-    blackRook: 10,
-    blackQueen: 11,
-    blackKing: 12
+    blackPawn: 11,
+    blackPawnStarting: 12,
+    blackPawnPassingBy: 13,
+    blackKnight: 14,
+    blackBishop: 15,
+    blackRook: 16,
+    blackRookStarting: 17,
+    blackQueen: 18,
+    blackKing: 19,
+    blackKingStarting: 20
 };
 
 var PlayerColor = {
-    unspecified : 0,
-    white : 1,
-    black : 2
+    unspecified: 0,
+    white: 1,
+    black: 2
 };
 
 var GameEndType = {
     whiteWin: 0,
-    blackWin : 1,
-    draw : 2
+    blackWin: 1,
+    draw: 2
 };
 
 function Chessboard(initialSize) {

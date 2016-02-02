@@ -1,16 +1,24 @@
 var SquareImageUrls = [
     "empty",
     "white-pawn",
+    "white-pawn",
+    "white-pawn",
     "white-knight",
     "white-bishop",
     "white-rook",
+    "white-rook",
     "white-queen",
     "white-king",
+    "white-king",
+    "black-pawn",
+    "black-pawn",
     "black-pawn",
     "black-knight",
     "black-bishop",
     "black-rook",
+    "black-rook",
     "black-queen",
+    "black-king",
     "black-king"
 ].map(function(name) {
     return  "./images/" + name + ".png";
