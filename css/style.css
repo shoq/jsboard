@@ -29,3 +29,11 @@ img.square-unselected {
 img.square-selected {
     border: 3px solid yellow;
 }
+
+#piece-box-div {
+    display: inline-block;
+    font-size: 0; /* Hides spaces between divs. */
+    margin-top: 25px;
+    border: 1px solid black;
+    background: #E0E0E0;
+}

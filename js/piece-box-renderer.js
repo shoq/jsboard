@@ -1,17 +1,19 @@
 function PieceBoxRenderer(pieceBoxControl, mouseDriver) {
 
     var piecesToDisplay = [
-        SquareType.whitePawn,
-        SquareType.whiteKnight,
-        SquareType.whiteBishop,
-        SquareType.whiteRook,
-        SquareType.whiteQueen,
-
-        SquareType.blackPawn,
-        SquareType.blackKnight,
-        SquareType.blackBishop,
-        SquareType.blackRook,
-        SquareType.blackQueen
+        [
+            SquareType.whitePawn,
+            SquareType.whiteKnight,
+            SquareType.whiteBishop,
+            SquareType.whiteRook,
+            SquareType.whiteQueen
+        ], [
+            SquareType.blackPawn,
+            SquareType.blackKnight,
+            SquareType.blackBishop,
+            SquareType.blackRook,
+            SquareType.blackQueen
+        ]
     ];
 
     var selectedElement = null;
@@ -37,11 +39,18 @@ function PieceBoxRenderer(pieceBoxControl, mouseDriver) {
         selectedElement.className = "square-unselected";
     });
 
-    piecesToDisplay.forEach(function(pieceType) {
-        var element = createElement();
-        setImage(element, pieceType);
-        wireUpEvents(element, pieceType);
-        pieceBoxControl.appendChild(element);
+    piecesToDisplay.forEach(function(row) {
+
+        var rankDiv = document.createElement('div');
+        rankDiv.className = 'rank';
+        pieceBoxControl.appendChild(rankDiv);
+
+        row.forEach(function (pieceType) {
+            var element = createElement();
+            setImage(element, pieceType);
+            wireUpEvents(element, pieceType);
+            rankDiv.appendChild(element);
+        });
     });
 
 }
