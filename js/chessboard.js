@@ -179,6 +179,12 @@ function Chessboard(initialSize) {
         return true;
     };
 
+    this.addPiece = function(rank, file, sourceType) {
+        if(squares[rank][file] == SquareType.empty) {
+            changeSquare(rank, file, sourceType);
+        }
+    };
+
     function changeSquare(rank, file, type) {
         squares[rank][file] = type;
         squareChanged.raise({ rank: rank, file: file, type: type});
