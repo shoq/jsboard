@@ -308,24 +308,26 @@ function Chessboard(initialSize) {
         return Math.abs(destRank - sourceRank) == Math.abs(destFile - sourceFile);
     }
 
-    function isLineMove(sourceRank, sourceFile, destRank, destFile) {
-        return sourceRank == destRank || sourceFile == destFile;
-    }
-    
     function isDiagonalOpen(sourceRank, sourceFile, destRank, destFile) {
-        var minRank = Math.min(sourceRank, destRank);
-        var maxRank = Math.max(sourceRank, destRank);
-        var minFile = Math.min(sourceFile, destFile);
+        var directionRank = sourceRank < destRank ? 1 : -1;
+        var directionFile = sourceFile < destFile ? 1 : -1;
         
-        var dist = maxRank - minRank; // Should be the same for files and ranks.
-        
-        for (var i = 1; i < dist; ++i) {
-            if (getPlayerColor(minRank + i, minFile + i) != PlayerColor.unspecified) {
+        var stepCount = Math.abs(destRank - sourceRank) - 1;
+
+        for (var step = 0; step < stepCount; ++step) {
+            var rank = sourceRank + directionRank * (step + 1);
+            var file = sourceFile + directionFile * (step + 1);
+
+            if (getPlayerColor(rank, file) != PlayerColor.unspecified) {
                 return false;
             }
         }
-        
+
         return true;
+    }
+    
+    function isLineMove(sourceRank, sourceFile, destRank, destFile) {
+        return sourceRank == destRank || sourceFile == destFile;
     }
     
     function isLineOpen(sourceRank, sourceFile, destRank, destFile) {
