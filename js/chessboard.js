@@ -41,11 +41,6 @@ function Position(rank, file) {
     this.file = file;
 }
 
-function MoveInfo(source, dest) {
-    this.source = source;
-    this.dest = dest;
-}
-
 function flipPlayerColor(playerColor) {
     return playerColor == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
 }
@@ -60,6 +55,46 @@ function isKing(squareType) {
         default:
             return false;
     }
+}
+
+function isKingStarting(squareType) {
+    return squareType == SquareType.whiteKingStarting || squareType == SquareType.blackKingStarting;
+}
+
+function isRookStarting(squareType) {
+    return squareType == SquareType.whiteRookStarting || squareType == SquareType.blackRookStarting;
+}
+
+function getRookByColor(playerColor) {
+    return playerColor == PlayerColor.white
+        ? SquareType.whiteRook
+        : SquareType.blackRook;
+}
+
+function getQueenByColor(playerColor) {
+    return playerColor == PlayerColor.white
+        ? SquareType.whiteQueen
+        : SquareType.blackQueen;
+}
+
+function getKingByColor(playerColor) {
+    return playerColor == PlayerColor.white
+        ? SquareType.whiteKing
+        : SquareType.blackKing;
+}
+
+function getPawnPassingByColor(playerColor) {
+    return playerColor == PlayerColor.white
+        ? SquareType.whitePawnPassing
+        : SquareType.blackPawnPassing;
+}
+
+function getDirection(source, dest) {
+    return source <= dest ? 1 : -1;
+}
+
+function getDistance(source, dest) {
+    return Math.abs(dest - source)
 }
 
 function Chessboard(initialSize) {
@@ -288,7 +323,7 @@ function Chessboard(initialSize) {
     function tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, destType, oldSquares) {
         var playerColor = getPlayerColor(sourceRank, sourceFile);
         var opponentColor = flipPlayerColor(playerColor);
-        
+
         restorePawnsPassing();
         setSquare(sourceRank, sourceFile, SquareType.empty);
         setSquare(destRank, destFile, destType);
@@ -357,7 +392,7 @@ function Chessboard(initialSize) {
             case SquareType.whiteKingStarting:
             case SquareType.blackKing:
             case SquareType.blackKingStarting:
-                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);
+                return tryToMoveKing(sourceRank, sourceFile, destRank, destFile);
                     
             default:
                 return false;
@@ -471,7 +506,8 @@ function Chessboard(initialSize) {
     
     function tryToMoveRook(sourceRank, sourceFile, destRank, destFile) {
         if (isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
+            var playerColor = getPlayerColor(sourceRank, sourceFile);
+            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, getRookByColor(playerColor), copyAllSquares());
         }
         
         return false;
@@ -483,6 +519,50 @@ function Chessboard(initialSize) {
         }
         
         return false;
+    }
+    
+    function tryToMoveKing(sourceRank, sourceFile, destRank, destFile) {
+        var playerColor = getPlayerColor(sourceRank, sourceFile);            
+
+        // Regular move.
+        if (isOneSquareMove(sourceRank, sourceFile, destRank, destFile)) {
+            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, getKingByColor(playerColor), copyAllSquares());
+        
+        // Castling.
+        } else if (isValidCastlingMove(sourceRank, sourceFile, destRank, destFile)) {
+            if (!isKingStarting(getSquare(sourceRank, sourceFile))) {
+                return false;
+            }
+            
+            var towerPosition = getCastlingTowerPosition(sourceRank, sourceFile, destRank, destFile);
+            if (!isRookStarting(getSquare(towerPosition.rank, towerPosition.file))) {
+                return false;
+            }
+
+            if (playerColor != getPlayerColor(towerPosition.rank, towerPosition.file)) {
+                return false;
+            }
+
+            var opponentColor = flipPlayerColor(playerColor);
+            var attackedSquares = getAttackedSquaresForPositions(getPiecePositionsByColor(opponentColor));
+            var hotPositions = getCastlingHotPositions(sourceRank, sourceFile, destRank, destFile);
+            
+            for (var i = 0; i < hotPositions.length; ++i) {
+                if (containsPosition(attackedSquares, hotPositions[i])) {
+                    return false;
+                }
+            }
+            
+            var oldSquares = copyAllSquares();
+            var newTowerPosition = getCastlingNewTowerPosition(sourceRank, sourceFile, destRank, destFile);
+            
+            setSquare(newTowerPosition.rank, newTowerPosition.file, getSquare(towerPosition.rank, towerPosition.file));
+            setSquare(towerPosition.rank, towerPosition.file, SquareType.empty);
+            
+            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, getKingByColor(playerColor), oldSquares);
+        } else {
+            return false;
+        }
     }
     
     function isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile) {
@@ -509,6 +589,45 @@ function Chessboard(initialSize) {
     
     function isDiagonalMove(sourceRank, sourceFile, destRank, destFile) {
         return getDistance(sourceRank, destRank) == getDistance(sourceFile, destFile);
+    }
+    
+    function isValidCastlingMove(sourceRank, sourceFile, destRank, destFile) {
+        return isCastlingMove(sourceRank, sourceFile, destRank, destFile)
+            && isValidLineMove(sourceRank, sourceFile, destRank, destFile);
+    }
+    
+    function isCastlingMove(sourceRank, sourceFile, destRank, destFile) {
+        return sourceRank == destRank && (destFile == sourceFile - 2 || destFile == sourceFile + 2);
+    }
+    
+    function getCastlingTowerPosition(sourceRank, sourceFile, destRank, destFile) {
+        if (destFile > sourceFile) {
+            return new Position(sourceRank, getSize() - 1);
+        } else {
+            return new Position(sourceRank, 0);
+        }
+    }
+    
+    function getCastlingNewTowerPosition(sourceRank, sourceFile, destRank, destFile) {
+        if (destFile > sourceFile) {
+            return new Position(sourceRank, sourceFile + 1);
+        } else {
+            return new Position(sourceRank, sourceFile - 1);
+        }
+    }
+    
+    function getCastlingHotPositions(sourceRank, sourceFile, destRank, destFile) {
+        if (destFile > sourceFile) {
+            return [
+                new Position(sourceRank, sourceFile),
+                new Position(sourceRank, sourceFile + 1),
+                new Position(sourceRank, sourceFile + 2)];
+        } else {
+            return [
+                new Position(sourceRank, sourceFile),
+                new Position(sourceRank, sourceFile - 1),
+                new Position(sourceRank, sourceFile - 2)];
+        }
     }
 
     function isDiagonalOpen(sourceRank, sourceFile, destRank, destFile) {
@@ -777,25 +896,5 @@ function Chessboard(initialSize) {
         } else {
             return getSize() - 1;
         }
-    }
-    
-    function getQueenByColor(playerColor) {
-        return playerColor == PlayerColor.white
-            ? SquareType.whiteQueen
-            : SquareType.blackQueen;
-    }
-    
-    function getPawnPassingByColor(playerColor) {
-        return playerColor == PlayerColor.white
-            ? SquareType.whitePawnPassing
-            : SquareType.blackPawnPassing;
-    }
-
-    function getDirection(source, dest) {
-        return source <= dest ? 1 : -1;
-    }
-
-    function getDistance(source, dest) {
-        return Math.abs(dest - source)
     }
 }
