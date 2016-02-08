@@ -238,7 +238,7 @@ function Chessboard(initialSize) {
     
     function copyAllSquares() {
         var size = getSize();
-        var newSquares = [];
+        var copied = [];
         
         for (var rank = 0; rank < size; ++rank) {
             var rankSquares = [];
@@ -246,17 +246,17 @@ function Chessboard(initialSize) {
                 rankSquares.push(getSquare(rank, file));
             }
             
-            newSquares.push(rankSquares);
+            copied.push(rankSquares);
         }
         
-        return newSquares;
+        return copied;
     }
     
-    function tryToApplyMove(sourceRank, sourceFile, destRank, destFile) {
-        return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, getSquare(sourceRank, sourceFile));
+    function tryToApplyMove(sourceRank, sourceFile, destRank, destFile, oldSquares) {
+        return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, getSquare(sourceRank, sourceFile), oldSquares);
     }
     
-    function tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, destType) {
+    function tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, destType, oldSquares) {
         //var oldSourceType = getSquare(sourceRank, sourceFile);
         //var oldDestType = getSquare(destRank, destFile);
         
@@ -390,15 +390,15 @@ function Chessboard(initialSize) {
         
         // Pawn reaching the final rank.
         if (destRank == finalRank) {
-            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType);
+            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType, copyAllSquares());
 
         // Pawn moving by only one square.
         } else if (distRank == 1) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
         
         // Pawn moving by more than one square.
         } else {
-            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerPawnPassingType);
+            return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerPawnPassingType, copyAllSquares());
         }
     }
     
@@ -423,20 +423,21 @@ function Chessboard(initialSize) {
             
             // Pawn reaching the final rank.
             if (destRank == finalRank) {
-                return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType);
+                return tryToApplyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType, copyAllSquares());
                 
             // Pawn not reaching the final rank.
             } else {
-                return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+                return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
             }
         }
 
         // Attack in passing.
         if (isSquareEmpty(destRank, destFile) && testSquare(sourceRank, destFile, opponentPawnPassingType)) {
-            if (tryToApplyMove(sourceRank, sourceFile, destRank, destFile)) {
-                changeSquare(sourceRank, destFile, SquareType.empty);
-                return true;
-            }
+            var oldSquares = copyAllSquares();
+            
+            changeSquare(sourceRank, destFile, SquareType.empty);
+
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, oldSquares);
         }
         
         return false;
@@ -444,7 +445,7 @@ function Chessboard(initialSize) {
     
     function tryToMoveKnight(sourceRank, sourceFile, destRank, destFile) {
         if (isValidJumpMove(sourceRank, sourceFile, destRank, destFile)) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
         }
         
         return false;
@@ -452,7 +453,7 @@ function Chessboard(initialSize) {
     
     function tryToMoveBishop(sourceRank, sourceFile, destRank, destFile) {
         if (isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile)) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
         }
         
         return false;
@@ -460,7 +461,7 @@ function Chessboard(initialSize) {
     
     function tryToMoveRook(sourceRank, sourceFile, destRank, destFile) {
         if (isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
         }
         
         return false;
@@ -468,7 +469,7 @@ function Chessboard(initialSize) {
     
     function tryToMoveQueen(sourceRank, sourceFile, destRank, destFile) {
         if (isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile) || isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
-            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile);
+            return tryToApplyMove(sourceRank, sourceFile, destRank, destFile, copyAllSquares());
         }
         
         return false;
