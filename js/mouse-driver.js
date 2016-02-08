@@ -15,7 +15,7 @@ function MouseDriver(chessboard) {
 
     function unselectCurrent() {
         if(selectedRank != -1 && selectedFile != -1) {
-            squareUnselected.raise(position(selectedRank, selectedFile));
+            squareUnselected.raise(new Position(selectedRank, selectedFile));
             selectedRank = -1;
             selectedFile = -1;
         }
@@ -27,7 +27,7 @@ function MouseDriver(chessboard) {
     }
 
     function select(rank, file) {
-        squareSelected.raise(position(rank, file));
+        squareSelected.raise(new Position(rank, file));
         selectedRank = rank;
         selectedFile = file;
     }
@@ -55,7 +55,7 @@ function MouseDriver(chessboard) {
                 }
                 // A newly clicked square must be selected.
             } else {
-                squareSelected.raise(position(rank, file));
+                squareSelected.raise(new Position(rank, file));
                 selectedRank = rank;
                 selectedFile = file;
             }

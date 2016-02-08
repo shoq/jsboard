@@ -3,10 +3,3 @@ function removeAllChildren(element) {
         element.removeChild(element.firstChild);
     }
 }
-
-function position(rank, file) {
-    return {
-        rank: rank,
-        file: file
-    };
-}
