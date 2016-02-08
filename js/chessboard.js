@@ -104,7 +104,7 @@ function Chessboard(initialSize) {
     var standardSize = 8;
     var squares = [];
     var currentPlayerColor = PlayerColor.white;
-	this.validationEnabled = true;
+	var validationEnabled = true;
     
     for (var i = 0; i < initialSize; ++i) {
         squares.push(createEmptyRank(initialSize));
@@ -155,6 +155,10 @@ function Chessboard(initialSize) {
         }
 
         sizeChanged.raise(null);
+    };
+    
+    this.enableValidation = function(enable) {
+        validationEnabled = enable;
     };
 
     this.resetToStandard = function() {
@@ -247,16 +251,23 @@ function Chessboard(initialSize) {
             return true;
         }
 
-        if (currentPlayerColor !== getPlayerColor(sourceRank, sourceFile)) {
+        if (validationEnabled) {
+            if (currentPlayerColor !== getPlayerColor(sourceRank, sourceFile)) {
+                return false;
+            }
+            
+            if (tryToMoveValidated(sourceRank, sourceFile, destRank, destFile) == true) {
+                toggleCurrentPlayer();
+                return true;
+            }
+
             return false;
-        }
-        
-        if (tryToMoveValidated(sourceRank, sourceFile, destRank, destFile) == true) {
-            toggleCurrentPlayer();
+        } else {
+            var squareType = getSquare(sourceRank, sourceFile);
+            changeSquare(sourceRank, sourceFile, SquareType.empty);
+            changeSquare(destRank, destFile, squareType);
             return true;
         }
-
-        return false;
     };
 
     this.addPiece = function(rank, file, sourceType) {
