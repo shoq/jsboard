@@ -286,16 +286,15 @@ function Chessboard(initialSize) {
             case SquareType.blackRookStarting:
                 return tryToMoveRook(sourceRank, sourceFile, destRank, destFile);
 
-            /*case SquareType.whiteQueen:
+            case SquareType.whiteQueen:
             case SquareType.blackQueen:
-                return isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile)
-                    || isValidLineMove(sourceRank, sourceFile, destRank, destFile);
+                return tryToMoveQueen(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteKing:
             case SquareType.whiteKingStarting:
             case SquareType.blackKing:
             case SquareType.blackKingStarting:
-                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);*/
+                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);
                     
             default:
                 return false;
@@ -415,6 +414,15 @@ function Chessboard(initialSize) {
     
     function tryToMoveRook(sourceRank, sourceFile, destRank, destFile) {
         if (isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
+            applyMove(sourceRank, sourceFile, destRank, destFile);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function tryToMoveQueen(sourceRank, sourceFile, destRank, destFile) {
+        if (isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile) || isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
             applyMove(sourceRank, sourceFile, destRank, destFile);
             return true;
         }
