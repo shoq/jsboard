@@ -3,7 +3,7 @@ var SquareType = {
 
     whitePawn: 1,
     whitePawnStarting: 2,
-    whitePawnPassingBy: 3,
+    whitePawnPassing: 3,
     whiteKnight: 4,
     whiteBishop: 5,
     whiteRook: 6,
@@ -14,7 +14,7 @@ var SquareType = {
 
     blackPawn: 11,
     blackPawnStarting: 12,
-    blackPawnPassingBy: 13,
+    blackPawnPassing: 13,
     blackKnight: 14,
     blackBishop: 15,
     blackRook: 16,
@@ -142,7 +142,7 @@ function Chessboard(initialSize) {
         return rank;
     }
     
-    var getSquareType = this.getSquareType = function(rank, file) {
+    var getSquare = this.getSquare = function(rank, file) {
         return squares[rank][file];
     };
 
@@ -159,7 +159,7 @@ function Chessboard(initialSize) {
 
             case SquareType.whitePawn:
             case SquareType.whitePawnStarting:
-            case SquareType.whitePawnPassingBy:
+            case SquareType.whitePawnPassing:
             case SquareType.whiteKnight:
             case SquareType.whiteBishop:
             case SquareType.whiteRook:
@@ -171,7 +171,7 @@ function Chessboard(initialSize) {
 
             case SquareType.blackPawn:
             case SquareType.blackPawnStarting:
-            case SquareType.blackPawnPassingBy:
+            case SquareType.blackPawnPassing:
             case SquareType.blackKnight:
             case SquareType.blackBishop:
             case SquareType.blackRook:
@@ -193,17 +193,14 @@ function Chessboard(initialSize) {
             return false;
         }
         
-        if (!isValidMove(sourceRank, sourceFile, destRank, destFile)) {
-            return false;
+        if (tryToMove(sourceRank, sourceFile, destRank, destFile) == true) {
+            //changeSquare(sourceRank, sourceFile, SquareType.empty);
+            //changeSquare(destRank, destFile, sourceType);
+            toggleCurrentPlayer();
+            return true;
         }
 
-        changeSquare(sourceRank, sourceFile, SquareType.empty);
-        changeSquare(destRank, destFile, sourceType);
-        
-        restorePawnsPassingBy();
-        changeStartingPawnToPassingByPawn(destRank, destFile);
-        toggleCurrentPlayer();
-        return true;
+        return false;
     };
 
     this.addPiece = function(rank, file, sourceType) {
@@ -216,6 +213,16 @@ function Chessboard(initialSize) {
         squares[rank][file] = type;
         squareChanged.raise({ rank: rank, file: file, type: type});
     }
+    
+    function applyMove(sourceRank, sourceFile, destRank, destFile) {
+        applyMoveAsType(sourceRank, sourceFile, destRank, destFile, getSquare(sourceRank, sourceFile));
+    }
+    
+    function applyMoveAsType(sourceRank, sourceFile, destRank, destFile, destType) {
+        restorePawnsPassing();
+        changeSquare(sourceRank, sourceFile, SquareType.empty);
+        changeSquare(destRank, destFile, destType);
+    }
 
     function testSquare(rank, file, type) {
         return squares[rank][file] == type;
@@ -225,15 +232,15 @@ function Chessboard(initialSize) {
         return squares[rank][file] == SquareType.empty;
     }
 
-    function restorePawnsPassingBy() {
+    function restorePawnsPassing() {
         var size = getSize();
         for (var rank = 0; rank < size; ++rank) {
             for (var file = 0; file < size; ++file) {
-                if (testSquare(rank, file, SquareType.whitePawnPassingBy)) {
+                if (testSquare(rank, file, SquareType.whitePawnPassing)) {
                     changeSquare(rank, file, SquareType.whitePawn);
                 }
                 
-                if (testSquare(rank, file, SquareType.blackPawnPassingBy)) {
+                if (testSquare(rank, file, SquareType.blackPawnPassing)) {
                     changeSquare(rank, file, SquareType.blackPawn);
                 }
             }
@@ -242,31 +249,31 @@ function Chessboard(initialSize) {
     
     function changeStartingPawnToPassingByPawn(destRank, destFile) {
         if (testSquare(destRank, destFile, SquareType.whitePawnStarting)) {
-            changeSquare(destRank, destFile, SquareType.whitePawnPassingBy);
+            changeSquare(destRank, destFile, SquareType.whitePawnPassing);
         }
         
         if (testSquare(destRank, destFile, SquareType.blackPawnStarting)) {
-            changeSquare(destRank, destFile, SquareType.blackPawnPassingBy);
+            changeSquare(destRank, destFile, SquareType.blackPawnPassing);
         }
     }
     
-    function isValidMove(sourceRank, sourceFile, destRank, destFile) {
+    function tryToMove(sourceRank, sourceFile, destRank, destFile) {
 
-        var squareType = getSquareType(sourceRank, sourceFile);
+        var squareType = getSquare(sourceRank, sourceFile);
         switch (squareType) {
             case SquareType.empty:
                 return false;
             
             case SquareType.whitePawn:
             case SquareType.whitePawnStarting:
-            case SquareType.whitePawnPassingBy:
-                return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, false, squareType == SquareType.whitePawnStarting);
+            case SquareType.whitePawnPassing:
+                return tryToMovePawn(sourceRank, sourceFile, destRank, destFile);
             case SquareType.blackPawn:
             case SquareType.blackPawnStarting:
-            case SquareType.blackPawnPassingBy:
-                return isValidPawnMove(sourceRank, sourceFile, destRank, destFile, true, squareType == SquareType.blackPawnStarting);
+            case SquareType.blackPawnPassing:
+                return tryToMovePawn(sourceRank, sourceFile, destRank, destFile);
 
-            case SquareType.whiteKnight:
+            /*case SquareType.whiteKnight:
             case SquareType.blackKnight:
                 return isValidJumpMove(sourceRank, sourceFile, destRank, destFile);
 
@@ -289,27 +296,32 @@ function Chessboard(initialSize) {
             case SquareType.whiteKingStarting:
             case SquareType.blackKing:
             case SquareType.blackKingStarting:
-                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);
+                return isOneSquareMove(sourceRank, sourceFile, destRank, destFile);*/
                     
             default:
-                return true;
+                return false;
         }
     }
     
-    function isValidPawnMove(sourceRank, sourceFile, destRank, destFile) {
-        return isValidPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile)
-            || isValidPawnAttackingMove(sourceRank, sourceFile, destRank, destFile);
+    function tryToMovePawn(sourceRank, sourceFile, destRank, destFile) {
+        return tryToMovePawnNonAttacking(sourceRank, sourceFile, destRank, destFile)
+            || tryToMovePawnAttacking(sourceRank, sourceFile, destRank, destFile);
     }
     
-    function isValidPawnNonAttackingMove(sourceRank, sourceFile, destRank, destFile) {
+    function tryToMovePawnNonAttacking(sourceRank, sourceFile, destRank, destFile) {
         var maxMoveDistance = getPawnMaxMoveDistance(sourceRank, sourceFile);
         var allowedDirection = getPawnDirection(sourceRank, sourceFile);
+        var playerColor = getPlayerColor(sourceRank, sourceFile);
+        var playerQueenType = getQueenByColor(playerColor);
+        var playerPawnPassingType = getPawnPassingByColor(playerColor);
+        var finalRank = getFinalRankByColor(playerColor);
         
         if (getDirection(sourceRank, destRank) != allowedDirection) {
             return false;
         }
         
-        if (getDistance(sourceRank, destRank) > maxMoveDistance) {
+        var distRank = getDistance(sourceRank, destRank);
+        if (distRank > maxMoveDistance) {
             return false;
         }
         
@@ -321,11 +333,34 @@ function Chessboard(initialSize) {
             return false;
         }
 
-        return isValidLineMove(sourceRank, sourceFile, destRank, destFile);
+        if (!isValidLineMove(sourceRank, sourceFile, destRank, destFile)) {
+            return false;
+        };
+        
+        // Pawn reaching the final rank.
+        if (destRank == finalRank) {
+            applyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType);
+            return true;
+
+        // Pawn moving by only one square.
+        } else if (distRank == 1) {
+            applyMove(sourceRank, sourceFile, destRank, destFile);
+            return true;
+        
+        // Pawn moving by more than one square.
+        } else {
+            applyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerPawnPassingType);
+            return true;
+        }
     }
     
-    function isValidPawnAttackingMove(sourceRank, sourceFile, destRank, destFile) {
+    function tryToMovePawnAttacking(sourceRank, sourceFile, destRank, destFile) {
         var allowedDirection = getPawnDirection(sourceRank, sourceFile);
+        var playerColor = getPlayerColor(sourceRank, sourceFile);
+        var playerQueenType = getQueenByColor(playerColor);
+        var finalRank = getFinalRankByColor(playerColor);
+        var opponentColor = getPlayerColor(destRank, destFile);
+        var opponentPawnPassingType = getPawnPassingByColor(flipPlayerColor(playerColor));
         
         if (destRank - sourceRank != allowedDirection) {
             return false;
@@ -335,16 +370,25 @@ function Chessboard(initialSize) {
             return false;
         }
         
-        var playerColor = getPlayerColor(sourceRank, sourceFile);
-        var opponentColor = getPlayerColor(destRank, destFile);
         
+        // Regular attack.
         if (!isSquareEmpty(destRank, destFile) && playerColor != opponentColor) {
-            return true;
+            
+            // Pawn reaching the final rank.
+            if (destRank == finalRank) {
+                applyMoveAsType(sourceRank, sourceFile, destRank, destFile, playerQueenType);
+                return true;
+                
+            // Pawn not reaching the final rank.
+            } else {
+                applyMove(sourceRank, sourceFile, destRank, destFile);
+                return true;
+            }
         }
-        
-        var pawnPassingByType = getPawnPassingByType(flipPlayerColor(playerColor));
-        
-        if (isSquareEmpty(destRank, destFile) && testSquare(sourceRank, destFile, pawnPassingByType)) {
+
+        // Attack in passing.
+        if (isSquareEmpty(destRank, destFile) && testSquare(sourceRank, destFile, opponentPawnPassingType)) {
+            applyMove(sourceRank, sourceFile, destRank, destFile);
             changeSquare(sourceRank, destFile, SquareType.empty);
             return true;
         }
@@ -432,9 +476,9 @@ function Chessboard(initialSize) {
             case SquareType.blackPawnStarting:
                 return 2;
             case SquareType.whitePawn:
-            case SquareType.whitePawnPassingBy:
+            case SquareType.whitePawnPassing:
             case SquareType.blackPawn:
-            case SquareType.blackPawnPassingBy:
+            case SquareType.blackPawnPassing:
                 return 1;
             default:
                 return 0;
@@ -445,21 +489,35 @@ function Chessboard(initialSize) {
         switch (squares[rank][file]) {
             case SquareType.whitePawn:
             case SquareType.whitePawnStarting:
-            case SquareType.whitePawnPassingBy:
+            case SquareType.whitePawnPassing:
                 return -1;
             case SquareType.blackPawn:
             case SquareType.blackPawnStarting:
-            case SquareType.blackPawnPassingBy:
+            case SquareType.blackPawnPassing:
                 return 1;
             default:
                 return 0;
         }
     }
     
-    function getPawnPassingByType(playerColor) {
+    function getFinalRankByColor(playerColor) {
+        if (playerColor == PlayerColor.white) {
+            return 0;
+        } else {
+            return getSize() - 1;
+        }
+    }
+    
+    function getQueenByColor(playerColor) {
         return playerColor == PlayerColor.white
-            ? SquareType.whitePawnPassingBy
-            : SquareType.blackPawnPassingBy;
+            ? SquareType.whiteQueen
+            : SquareType.blackQueen;
+    }
+    
+    function getPawnPassingByColor(playerColor) {
+        return playerColor == PlayerColor.white
+            ? SquareType.whitePawnPassing
+            : SquareType.blackPawnPassing;
     }
 
     function getDirection(source, dest) {

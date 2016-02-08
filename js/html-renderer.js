@@ -51,7 +51,7 @@ function HtmlRenderer(chessboard, boardControl, mouseDriver) {
 
     function createSquareDiv(rank, file) {
 
-        var squareType = chessboard.getSquareType(rank, file);
+        var squareType = chessboard.getSquare(rank, file);
         var squareImage = new Image();
         var squareDiv = document.createElement('div');
                 
