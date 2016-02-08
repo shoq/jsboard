@@ -69,6 +69,7 @@ function Chessboard(initialSize) {
     var standardSize = 8;
     var squares = [];
     var currentPlayerColor = PlayerColor.white;
+	this.validationEnabled = true;
     
     for (var i = 0; i < initialSize; ++i) {
         squares.push(createEmptyRank(initialSize));

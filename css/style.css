@@ -37,3 +37,11 @@ img.square-selected {
     border: 1px solid black;
     background: #E0E0E0;
 }
+
+#controls {
+    margin-top: 25px;
+	padding: 10px 0;
+	display: block;
+    border: 1px solid black;
+    background: #E0E0E0;
+}
