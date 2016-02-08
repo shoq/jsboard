@@ -267,21 +267,20 @@ function Chessboard(initialSize) {
             case SquareType.whitePawn:
             case SquareType.whitePawnStarting:
             case SquareType.whitePawnPassing:
-                return tryToMovePawn(sourceRank, sourceFile, destRank, destFile);
             case SquareType.blackPawn:
             case SquareType.blackPawnStarting:
             case SquareType.blackPawnPassing:
                 return tryToMovePawn(sourceRank, sourceFile, destRank, destFile);
 
-            /*case SquareType.whiteKnight:
+            case SquareType.whiteKnight:
             case SquareType.blackKnight:
-                return isValidJumpMove(sourceRank, sourceFile, destRank, destFile);
+                return tryToMoveKnight(sourceRank, sourceFile, destRank, destFile);
 
             case SquareType.whiteBishop:
             case SquareType.blackBishop:
-                return isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile);
+                return tryToMoveBishop(sourceRank, sourceFile, destRank, destFile);
                 
-            case SquareType.whiteRook:
+            /*case SquareType.whiteRook:
             case SquareType.whiteRookStarting:
             case SquareType.blackRook:
             case SquareType.blackRookStarting:
@@ -390,6 +389,24 @@ function Chessboard(initialSize) {
         if (isSquareEmpty(destRank, destFile) && testSquare(sourceRank, destFile, opponentPawnPassingType)) {
             applyMove(sourceRank, sourceFile, destRank, destFile);
             changeSquare(sourceRank, destFile, SquareType.empty);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function tryToMoveKnight(sourceRank, sourceFile, destRank, destFile) {
+        if (isValidJumpMove(sourceRank, sourceFile, destRank, destFile)) {
+            applyMove(sourceRank, sourceFile, destRank, destFile);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function tryToMoveBishop(sourceRank, sourceFile, destRank, destFile) {
+        if (isValidDiagonalMove(sourceRank, sourceFile, destRank, destFile)) {
+            applyMove(sourceRank, sourceFile, destRank, destFile);
             return true;
         }
         
